@@ -3,7 +3,7 @@ import os
 from functools import lru_cache
 
 from dotenv import load_dotenv
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, Field
 
@@ -20,6 +20,9 @@ app = FastAPI(title="SQL Agent", description="Ask questions about a sample shop 
 def get_llm():
     from langchain_google_genai import ChatGoogleGenerativeAI
 
+    if not os.getenv("GOOGLE_API_KEY"):
+        raise HTTPException(500, "GOOGLE_API_KEY is missing. Copy .env.example to .env and paste your free key "
+                                 "from https://aistudio.google.com/apikey")
     return ChatGoogleGenerativeAI(model=os.getenv("GEMINI_MODEL", "gemini-3.5-flash"))
 
 
